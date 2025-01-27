@@ -1,56 +1,55 @@
-class User {
-    static usersNumber = 0;
-    static countUsers() {
-        User.usersNumber++;
-    }
-    static {
-        console.log('Load class USER');
+{
+    class User {
+        static usersNumber = 0;
+        static countUsers() {
+            User.usersNumber++;
+        }
+        static {
+            console.log('Load class USER');
+        }
+
+        #name: string;
+        #age: number;
+        pets?: string[];
+        constructor(name: string, age: number, pets: string[] = []) {
+            this.#name = name;
+            this.#age = age;
+            this.pets = pets;
+            User.countUsers();
+        }
+
+        get name() {
+            return this.#name;
+        }
+
+        set name(name) {
+            this.#name = name;
+        }
+
+        greet(): void {
+            console.log(`Hola, soy ${this.#name} y tengo ${this.#age} años`);
+        }
+
+        grow(): void {
+            this.#age++;
+        }
     }
 
-    #name: string;
-    #age: number;
-    pets?: string[];
-    constructor(name: string, age: number, pets: string[] = []) {
-        this.#name = name;
-        this.#age = age;
-        this.pets = pets;
-        User.countUsers();
-    }
+    const user1 = new User('Pepe', 22, ['Rufo']);
+    const user2 = new User('Juan', 24);
 
-    get name() {
-        return this.#name;
-    }
+    console.log(user1, user2);
+    // user1.address = 'Soria';
+    // // user1.#name = 'Jose';
+    // // delete user1.#name;
+    console.log(user1, user2);
 
-    set name(name) {
-        this.#name = name;
-    }
+    user1.grow();
+    user1.greet();
+    user2.greet();
 
-    greet(): void {
-        console.log(`Hola, soy ${this.#name} y tengo ${this.#age} años`);
-    }
-
-    grow(): void {
-        this.#age++;
-    }
+    console.log(User.usersNumber);
 }
-
-const user1 = new User('Pepe', 22, ['Rufo']);
-const user2 = new User('Juan', 24);
-
-console.log(user1, user2);
-// user1.address = 'Soria';
-// // user1.#name = 'Jose';
-// // delete user1.#name;
-console.log(user1, user2);
-
-user1.grow();
-user1.greet();
-user2.greet();
-
-console.log(User.usersNumber);
-
-// user1.name = 'Jose';
-// console.log(user1.name);
 
 // Clase define factura (Invoice)
 // Numero de factura
@@ -62,7 +61,7 @@ console.log(User.usersNumber);
 //  - El concepto X número --- precio
 //  - Total + IVA
 
-class Company {
+export class Company {
     #nif: string;
     #name: string;
 
@@ -82,7 +81,6 @@ class Company {
 export class Product {
     // eslint-disable-next-line no-unused-private-class-members
     #sku: string;
-    // eslint-disable-next-line no-unused-private-class-members
     #name: string;
     #unityPrice: number;
     constructor(sku: string, name: string, unitaryPrice: number) {
@@ -90,18 +88,22 @@ export class Product {
         this.#name = name;
         this.#unityPrice = unitaryPrice;
     }
+
     #calculatePrice(items: number) {
         return items * this.#unityPrice;
     }
+
     renderInvoiceLine(amount: number) {
         const tuple: [string, number] = ['', this.#calculatePrice(amount)];
-        return `${item.name} + ${this.#amount} unidades a ${
-            item.unityPrice
-        } € Total.................. ${tuple[1]}€ `;
+        tuple[0] = `
+        ${this.#name}: ${amount} unidades a ${
+            this.#unityPrice
+        }€ Total.................. ${tuple[1]}€`;
+        return tuple;
     }
 }
 
-interface Item {
+export interface Item {
     product: Product;
     amount: number;
 }
@@ -120,15 +122,17 @@ export class Invoice {
     #id = Invoice.#getID();
     #client: Company;
     #items: Item[];
-    #amount: number;
     #iva: number;
     #total: number = 0;
 
     // constructor
     constructor(client: Company, product: Product, amount: number, iva = 1.21) {
-        this.#items = [{ product: product, amount: amount }];
-        this.#products = [product];
-        this.#amount = amount;
+        this.#items = [
+            {
+                product: product,
+                amount: amount,
+            },
+        ];
         this.#iva = iva;
         this.#client = client;
     }
@@ -150,15 +154,15 @@ export class Invoice {
         Nif: ${this.#client.nif}
 
         Factura ${this.#id}
-        ${this.#products
+
+        ${this.#items
             .map((item) => {
-                const tuple = item.renderInvoiceLine(this.#amount);
+                const tuple = item.product.renderInvoiceLine(item.amount);
                 this.#calculatePrice(tuple[1]);
                 return tuple[0];
             })
             .join('\n')}
         
-
         ----------------------------------------------
         Total + IVA ........... ${this.#total}
         `;
