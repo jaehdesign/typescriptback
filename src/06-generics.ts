@@ -83,71 +83,25 @@
     console.log(numberBox.getContent()); // 123
     console.log(stringBox.getContent()); // Hello
 }
+
+// Generics with 2 types
 {
-    interface Repository<T> {
-        read: () => T[];
-        readById: (id: string) => T;
-        create: (data: Partial<T>) => T;
-        update: (id: string, data: Partial<T>) => T;
-        delete: (id: string) => T;
-    }
-
-    type Note = {
-        id: string;
-        title: string;
-        content: string;
+    const makeTuple = <T, U>(a: T, b: U): [T, U] => [a, b];
+    const tuple = makeTuple<string, number>('hello', 42);
+    // ^? const tuple: [string, number]
+    // const tuple: [string, number]
+}
+{
+    type User = {
+        name: string;
+        age: number;
+        job?: string;
     };
+    type PartialUser = Partial<User>;
+    type RequiredUser = Required<User>;
+    type ReadonlyUser = Readonly<User>;
+    type PickUser = Pick<User, 'name' | 'age'>;
+    type OmitUser = Omit<User, 'job'>;
 
-    class RepoNotesSQL implements Repository<Note> {
-        read() {
-            return [];
-        }
-
-        readById(id: string) {
-            return { id } as Note;
-        }
-
-        create(data: Partial<Note>) {
-            return { data } as unknown as Note;
-        }
-
-        update(id: string, data: Partial<Note>) {
-            return { id, data } as unknown as Note;
-        }
-
-        delete(id: string) {
-            return { id } as Note;
-        }
-
-        generateSQL() {
-            return '';
-        }
-    }
-
-    // class RepoNotesMongo implements Repository {
-    //     read() {
-    //         return [];
-    //     }
-
-    //     readById(id: string) {
-    //         return {};
-    //     }
-
-    //     create(data: PartialItem) {
-    //         return {};
-    //     }
-
-    //     update(id: string, data: PartialItem) {
-    //         return {};
-    //     }
-
-    //     delete(id: string) {
-    //         return {};
-    //     }
-    // }
-
-    const repo: Repository<Note> = new RepoNotesSQL();
-
-    repo.read();
-    (repo as RepoNotesSQL).generateSQL();
+    const PartialUser: Partial<User> = { name: 'Pepe' };
 }
