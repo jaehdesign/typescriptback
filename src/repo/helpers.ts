@@ -3,5 +3,5 @@ export const readFromDisk = (file: string): string => {
 };
 
 export const writeToDisk = (file: string, data: string): void => {
-    console.log(data);
+    console.log(data, file);
 };
